@@ -1,49 +1,26 @@
-name: MySQL Tests
+name: Test MySQL Database Connection
 
-on:
-  push:
-  pull_request:
+on: [push]
 
 jobs:
-  test:
+  test-db:
     runs-on: ubuntu-latest
-
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: rootpassword
-          MYSQL_DATABASE: todo_app_test
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Wait for MySQL to be ready
-        run: |
-          until mysqladmin ping -h localhost -uroot -prootpassword; do
-            echo "Waiting for MySQL to be ready..."
-            sleep 5
-          done
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
-      - name: Setup database schema (if needed)
-        run: |
-          mysql -h localhost -u root -p rootpassword -e "CREATE DATABASE IF NOT EXISTS todo_app_test;"
+      - name: Install Dependencies
+        run: npm install
 
-      - name: Install dependencies
-        run: npm install  # Beispiel: Installiere Abhängigkeiten für deine Tests
-
-      - name: Run tests
+      - name: Run Database Test
+        run: node test-db.js
         env:
-          DB_HOST: localhost
-          DB_USER: root
-          DB_PASSWORD: rootpassword
-          DB_DATABASE: todo_app_test
-        run: |
-          echo "Running MySQL tests..."
-          # Hier deine Tests ausführen, die die MySQL-Datenbank verwenden
-          # Beispiel: npm test
-
+          MYSQL_HOST: localhost
+          MYSQL_USER: akocerke
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_DATABASE: todo_app
