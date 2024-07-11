@@ -1,0 +1,31 @@
+name: MySQL Test
+
+on:
+  push:
+    branches:
+      - main  # Ändere dies entsprechend deinem Haupt-Branch
+
+jobs:
+  test-mysql:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install mysql2
+        run: npm install mysql2
+
+      - name: Run MySQL test
+        env:
+          MYSQL_HOST: localhost
+          MYSQL_USER: akocerke
+          MYSQL_PASSWORD: akocerke
+          MYSQL_DATABASE: todo_app
+        run: |
+          node test-db.js
