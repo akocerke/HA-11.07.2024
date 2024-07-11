@@ -31,14 +31,14 @@ jobs:
 
       - name: Setup database schema (if needed)
         run: |
-          mysql -h mysql -u root -prootpassword -e "CREATE DATABASE IF NOT EXISTS todo_app_test;"
+          mysql -h localhost -u root -p rootpassword -e "CREATE DATABASE IF NOT EXISTS todo_app_test;"
 
       - name: Install dependencies
         run: npm install  # Beispiel: Installiere Abhängigkeiten für deine Tests
 
       - name: Run tests
         env:
-          DB_HOST: mysql
+          DB_HOST: localhost
           DB_USER: root
           DB_PASSWORD: rootpassword
           DB_DATABASE: todo_app_test
