@@ -9,6 +9,16 @@ jobs:
   test-mysql:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: todo_app
+        ports:
+          - "3306:3306"
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -18,14 +28,21 @@ jobs:
         with:
           node-version: '14'
 
+      - name: Start MySQL Docker container
+        run: docker-compose up -d
+        working-directory: ${{ github.workspace }}
+
+      - name: Wait for MySQL to be ready
+        run: dockerize -wait tcp://localhost:3306 -timeout 1m
+
       - name: Install mysql2
         run: npm install mysql2
 
       - name: Run MySQL test
         env:
           MYSQL_HOST: localhost
-          MYSQL_USER: akocerke
-          MYSQL_PASSWORD: akocerke
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root
           MYSQL_DATABASE: todo_app
         run: |
           node test-db.js
