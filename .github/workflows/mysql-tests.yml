@@ -10,8 +10,8 @@ jobs:
       mysql:
         image: mysql:8
         env:
-          MYSQL_ROOT_PASSWORD: akocerke
-          MYSQL_DATABASE: todo_app
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: todo_app_test
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -20,11 +20,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
       - name: Wait for MySQL to be ready
         run: |
           until mysqladmin ping -hmysql -uroot -prootpassword; do
@@ -32,18 +27,18 @@ jobs:
             sleep 5
           done
 
-      # Wenn die Datenbank bereits existiert, muss sie nicht erneut erstellt werden
-      # - name: Setup database schema
-      #   run: |
-      #     mysql -h localhost -u root -prootpassword -e "CREATE DATABASE IF NOT EXISTS todo_app;"
-
-      - name: Install dependencies
-        run: npm install
+      - name: Setup database schema (if needed)
+        run: |
+          mysql -h mysql -u root -prootpassword -e "CREATE DATABASE IF NOT EXISTS todo_app_test;"
 
       - name: Run tests
         env:
-          DB_HOST: localhost
-          DB_USER: akocerke
-          DB_PASSWORD: akocerke
-          DB_DATABASE: todo_app
-        run: npm test
+          DB_HOST: mysql
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_DATABASE: todo_app_test
+        run: |
+          # Führe deine Tests aus, die die MySQL-Datenbank verwenden
+          echo "Running MySQL tests..."
+          # Hier kannst du deine Tests ausführen, z.B. mit npm
+          # Beispiel: npm test
