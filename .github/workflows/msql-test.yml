@@ -1,7 +1,7 @@
 name: MySQL Connection Test
 on: [push, pull_request]
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     services:
       mysql:
