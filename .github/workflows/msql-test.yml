@@ -21,11 +21,35 @@ jobs:
       - name: Install mysql2
         run: npm install mysql2
 
+      - name: Set up MySQL
+        run: |
+          mysql -e "CREATE DATABASE IF NOT EXISTS todo_tst_app;"
+          mysql -e "USE todo_tst_app;"
+
       - name: Run MySQL test
         env:
           MYSQL_HOST: localhost
-          MYSQL_USER: akocerke
-          MYSQL_PASSWORD: akocerke
-          MYSQL_DATABASE: todo_app
+          MYSQL_USER: root  # Anpassen, falls dein MySQL-Benutzername anders ist
+          MYSQL_PASSWORD: ''  # Anpassen, falls ein Passwort erforderlich ist
+          MYSQL_DATABASE: todo_tst_app
         run: |
-          node test-db.js
+          const mysql = require('mysql2');
+
+          const connection = mysql.createConnection({
+              host: process.env.MYSQL_HOST,
+              user: process.env.MYSQL_USER,
+              password: process.env.MYSQL_PASSWORD,
+              database: process.env.MYSQL_DATABASE
+          });
+
+          connection.connect((err) => {
+              if (err) {
+                  console.error('Fehler beim Verbinden mit der Datenbank:', err.stack);
+                  return;
+              }
+
+              console.log('Verbunden mit der MySQL-Datenbank als ID:', connection.threadId);
+
+              // Hier kannst du weitere Tests oder Abfragen ausführen
+              connection.end();
+          });
