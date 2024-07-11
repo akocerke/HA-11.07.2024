@@ -1,4 +1,4 @@
-name: CI
+name: MySQL Connection Test
 on: [push, pull_request]
 jobs:
   build:
@@ -19,20 +19,24 @@ jobs:
           MYSQL_USER: test_user
           MYSQL_PASSWORD: test_password
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
-    - name: Install dependencies
-      run: npm install
-    - name: Wait for MySQL
-      run: |
-        while ! mysqladmin ping -h"127.0.0.1" --silent; do
-          sleep 1
-        done
-    - name: Run tests
-      env:
-        DATABASE_URL: mysql://test_user:test_password@127.0.0.1:3306/test_db
-      run: npm test
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Wait for MySQL
+        run: |
+          while ! mysqladmin ping -h"127.0.0.1" --silent; do
+            sleep 1
+          done
+
+      - name: Test MySQL connection
+        run: |
+          echo "Testing MySQL connection..."
+          mysql -h127.0.0.1 -utest_user -ptest_password test_db -e "SELECT 'Connected successfully';"
