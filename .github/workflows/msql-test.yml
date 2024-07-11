@@ -1,48 +1,38 @@
-name: MySQL Test
-
-on:
-  push:
-    branches:
-      - main  # Ändere dies entsprechend deinem Haupt-Branch
-
+name: CI
+on: [push, pull_request]
 jobs:
-  test-mysql:
+  build:
     runs-on: ubuntu-latest
-
     services:
       mysql:
         image: mysql:8
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: todo_app
         ports:
-          - "3306:3306"
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
-      - name: Start MySQL Docker container
-        run: docker-compose up -d
-        working-directory: ${{ github.workspace }}
-
-      - name: Wait for MySQL to be ready
-        run: dockerize -wait tcp://localhost:3306 -timeout 1m
-
-      - name: Install mysql2
-        run: npm install mysql2
-
-      - name: Run MySQL test
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
         env:
-          MYSQL_HOST: localhost
-          MYSQL_USER: root
-          MYSQL_PASSWORD: root
-          MYSQL_DATABASE: todo_app
-        run: |
-          node test-db.js
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: test_password
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    - name: Install dependencies
+      run: npm install
+    - name: Wait for MySQL
+      run: |
+        while ! mysqladmin ping -h"127.0.0.1" --silent; do
+          sleep 1
+        done
+    - name: Run tests
+      env:
+        DATABASE_URL: mysql://test_user:test_password@127.0.0.1:3306/test_db
+      run: npm test
