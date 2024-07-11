@@ -1,6 +1,8 @@
 name: MySQL Tests
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
   test:
@@ -22,7 +24,7 @@ jobs:
 
       - name: Wait for MySQL to be ready
         run: |
-          until mysqladmin ping -hmysql -uroot -prootpassword; do
+          until mysqladmin ping -h mysql -uroot -prootpassword; do
             echo "Waiting for MySQL to be ready..."
             sleep 5
           done
@@ -38,7 +40,5 @@ jobs:
           DB_PASSWORD: rootpassword
           DB_DATABASE: todo_app_test
         run: |
-          # Führe deine Tests aus, die die MySQL-Datenbank verwenden
           echo "Running MySQL tests..."
-          # Hier kannst du deine Tests ausführen, z.B. mit npm
-          # Beispiel: npm test
+          # Execute your MySQL tests here
