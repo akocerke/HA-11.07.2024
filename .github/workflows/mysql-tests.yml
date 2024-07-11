@@ -33,6 +33,9 @@ jobs:
         run: |
           mysql -h mysql -u root -prootpassword -e "CREATE DATABASE IF NOT EXISTS todo_app_test;"
 
+      - name: Install dependencies
+        run: npm install  # Beispiel: Installiere Abhängigkeiten für deine Tests
+
       - name: Run tests
         env:
           DB_HOST: mysql
@@ -41,4 +44,6 @@ jobs:
           DB_DATABASE: todo_app_test
         run: |
           echo "Running MySQL tests..."
-          # Execute your MySQL tests here
+          # Hier deine Tests ausführen, die die MySQL-Datenbank verwenden
+          # Beispiel: npm test
+
