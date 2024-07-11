@@ -40,4 +40,5 @@ jobs:
         run: |
           # Führe deine Tests aus, die die MySQL-Datenbank verwenden
           echo "Running MySQL tests..."
-          # Beispiel: npm test oder node test-db.js
+          # Hier kannst du deine Tests ausführen, z.B. mit npm
+          # Beispiel: npm test
