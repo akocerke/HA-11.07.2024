@@ -9,16 +9,6 @@ jobs:
   test-mysql:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_DATABASE: todo_tst_app
-          MYSQL_ROOT_PASSWORD: root_password
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -28,37 +18,14 @@ jobs:
         with:
           node-version: '14'
 
-      - name: Wait for MySQL to be ready
-        run: dockerize -wait tcp://localhost:3306 -timeout 1m
-
       - name: Install mysql2
         run: npm install mysql2
 
       - name: Run MySQL test
         env:
           MYSQL_HOST: localhost
-          MYSQL_USER: root
-          MYSQL_PASSWORD: root_password
-          MYSQL_DATABASE: todo_tst_app
+          MYSQL_USER: akocerke
+          MYSQL_PASSWORD: akocerke
+          MYSQL_DATABASE: todo_app
         run: |
-          const mysql = require('mysql2');
-
-          const connection = mysql.createConnection({
-              host: process.env.MYSQL_HOST,
-              user: process.env.MYSQL_USER,
-              password: process.env.MYSQL_PASSWORD,
-              database: process.env.MYSQL_DATABASE,
-              port: process.env.MYSQL_PORT || 3306  // Port für MySQL
-          });
-
-          connection.connect((err) => {
-              if (err) {
-                  console.error('Fehler beim Verbinden mit der Datenbank:', err.stack);
-                  return;
-              }
-
-              console.log('Verbunden mit der MySQL-Datenbank als ID:', connection.threadId);
-
-              // Hier kannst du weitere Tests oder Abfragen ausführen
-              connection.end();
-          });
+          node test-db.js
