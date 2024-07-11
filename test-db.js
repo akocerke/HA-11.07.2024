@@ -2,13 +2,7 @@
 
 const mysql = require('mysql2');
 
-// Konfigurationsdaten für die MySQL-Verbindung
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'akocerke',
-  password: 'akocerke',
-  database: 'todo_app'
-});
+
 
 // Verbindung zur Datenbank herstellen
 connection.connect((err) => {
