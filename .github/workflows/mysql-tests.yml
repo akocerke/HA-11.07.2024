@@ -1,0 +1,49 @@
+name: MySQL Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: akocerke
+          MYSQL_DATABASE: todo_app
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Wait for MySQL to be ready
+        run: |
+          until mysqladmin ping -hmysql -uroot -prootpassword; do
+            echo "Waiting for MySQL to be ready..."
+            sleep 5
+          done
+
+      # Wenn die Datenbank bereits existiert, muss sie nicht erneut erstellt werden
+      # - name: Setup database schema
+      #   run: |
+      #     mysql -h localhost -u root -prootpassword -e "CREATE DATABASE IF NOT EXISTS todo_app;"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        env:
+          DB_HOST: localhost
+          DB_USER: akocerke
+          DB_PASSWORD: akocerke
+          DB_DATABASE: todo_app
+        run: npm test
